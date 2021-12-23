@@ -6,6 +6,8 @@ import com.navi.apilivraria.resource.exceptions.DuplicatedIsbnException;
 import com.navi.apilivraria.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 public class BookServiceImpl implements BookService {
 
     private BookRepository bookRepository;
@@ -20,5 +22,10 @@ public class BookServiceImpl implements BookService {
             throw new DuplicatedIsbnException("ISBN já cadastrada.");
         }
         return bookRepository.save(book);
+    }
+
+    @Override
+    public Optional<Book> getById(Long id) {
+        return Optional.empty();
     }
 }
