@@ -131,7 +131,6 @@ public class BookControllerTest {
                 .andExpect(jsonPath("author").value(createBookDTO().getAuthor()))
                 .andExpect(jsonPath("isbn").value(createBookDTO().getIsbn()));
 
-
     }
 
     @Test
@@ -147,6 +146,26 @@ public class BookControllerTest {
 
         mvc.perform(bookRequest)
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve retornar resourcer not found se o id do livro não existe")
+    public void deleteBookByIdNoExist() throws Exception{
+        Long id = 1L;
+
+        BDDMockito.given(bookService.getById(id)).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder bookRequest = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/" + id));
+
+        mvc.perform(bookRequest)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro pelo seu id")
+    public void deleteBookById() throws Exception{
+
     }
 
     private BookDTO createBookDTO() {
