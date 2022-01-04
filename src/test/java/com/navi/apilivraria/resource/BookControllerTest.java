@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -163,9 +164,48 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("Deve deletar um livro pelo seu id")
-    public void deleteBookById() throws Exception{
+    @DisplayName("Deve atualizar um livro pelo seu id")
+    public void updateBookById() throws Exception{
+        Long id = 1L;
+        String json = new ObjectMapper().writeValueAsString(createBookDTO());
+        Book book = Book.builder()
+               .id(id)
+               .title("Codando para o núcleo de desenvolvimento da unime")
+               .author("Ivan Santos de Jesus Júnior")
+               .isbn("27062001").build();
+        BDDMockito.given(bookService.getById(anyLong())).willReturn(Optional.of(book));
+        Book updatedBook = Book.builder().id(id).author("Ivan Júnior").title("Codando para o núcleo").isbn("27062001")
+                .build();
+        BDDMockito.given(bookService.update(book)).willReturn(updatedBook);
 
+        MockHttpServletRequestBuilder bookRequest = MockMvcRequestBuilders
+               .put(BOOK_API.concat("/"+id))
+               .content(json)
+               .accept(MediaType.APPLICATION_JSON)
+               .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(bookRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("title").value(createBookDTO().getTitle()))
+                .andExpect(jsonPath("author").value(createBookDTO().getAuthor()))
+                .andExpect(jsonPath("isbn").value(createBookDTO().getIsbn()));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 se o id do livro não existir")
+    public void noUpdateBookByUnexcitingId() throws Exception{
+        String json = new ObjectMapper().writeValueAsString(createBookDTO());
+        BDDMockito.given(bookService.getById(anyLong())).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder bookRequest = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/"+1L))
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(bookRequest)
+                .andExpect(status().isNotFound());
     }
 
     private BookDTO createBookDTO() {

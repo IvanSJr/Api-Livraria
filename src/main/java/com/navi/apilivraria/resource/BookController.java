@@ -18,9 +18,9 @@ import javax.validation.Valid;
 @RequestMapping("/api/books")
 public class BookController {
 
-    private BookService bookService;
+    private final BookService bookService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     public BookController(BookService bookService, ModelMapper modelMapper) {
         this.bookService = bookService;
@@ -52,6 +52,19 @@ public class BookController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
         bookService.delete(book);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookDTO updateBookById(@PathVariable Long id, BookDTO dto){
+        return bookService.getById(id).map(book -> {
+            book.setAuthor(dto.getAuthor());
+            book.setTitle(dto.getTitle());
+            book = bookService.update(book);
+            return modelMapper.map(book, BookDTO.class);
+        }).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
