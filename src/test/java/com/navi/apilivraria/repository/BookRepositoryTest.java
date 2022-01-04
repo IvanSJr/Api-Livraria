@@ -69,4 +69,28 @@ public class BookRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("Deve salvar um livro")
+    public void saveBookTest(){
+        Book book = registerABook("123");
+
+        Book savedBook = bookRepository.save(book);
+
+        assertThat(savedBook.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro")
+    public void deleteBookTest(){
+        Book book = registerABook("458");
+        testEntityManager.persist(book);
+
+        Book foundBook = testEntityManager.find(Book.class, book.getId());
+        bookRepository.delete(foundBook);
+
+        Book deletedBook = testEntityManager.find(Book.class, book.getId());
+
+        assertThat(deletedBook).isNull();
+    }
+
 }
