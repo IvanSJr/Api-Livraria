@@ -6,6 +6,7 @@ import com.navi.apilivraria.domain.Loan;
 import com.navi.apilivraria.dto.LoanDTO;
 import com.navi.apilivraria.service.BookService;
 import com.navi.apilivraria.service.LoanService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,6 +66,28 @@ public class LoanControllerTest {
         mvc.perform(requestBuilder)
                 .andExpect( status().isCreated() )
                 .andExpect( content().string("1"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro ao passar um isbn inexistente")
+    public void invalidIsbnMakeLoan() throws Exception {
+        LoanDTO loanDTO = LoanDTO.builder().isbn("27062001").customer("Ivan").build();
+        String json = new ObjectMapper().writeValueAsString(loanDTO);
+
+        BDDMockito.given(bookService.getBookByIsbn(loanDTO.getIsbn()))
+                .willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(LOAN_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(requestBuilder)
+                .andExpect( status().isBadRequest() )
+                .andExpect( jsonPath("errors", Matchers.hasSize(1)))
+                .andExpect( jsonPath("errors[0]").value("Book not found for passed isbn"))
+        ;
+
     }
 
 }
