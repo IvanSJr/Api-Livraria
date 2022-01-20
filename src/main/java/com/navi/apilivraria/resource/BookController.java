@@ -83,17 +83,5 @@ public class BookController {
         return new PageImpl<BookDTO>(bookList, pageRequest, result.getTotalElements());
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrors handleValidationExceptions(MethodArgumentNotValidException exception){
-        BindingResult bindingResult = exception.getBindingResult();
-        return new ApiErrors(bindingResult);
-    }
-
-    @ExceptionHandler(DuplicatedIsbnException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrors handleDuplicatedIsbnException(DuplicatedIsbnException exception){
-        return new ApiErrors(exception);
-    }
 
 }

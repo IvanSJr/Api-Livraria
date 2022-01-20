@@ -1,6 +1,7 @@
 package com.navi.apilivraria.resource.exceptions;
 
 import org.springframework.validation.BindingResult;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,10 @@ public class ApiErrors {
 
     public ApiErrors(DuplicatedIsbnException exception) {
         this.errors = Arrays.asList(exception.getMessage());
+    }
+
+    public ApiErrors(ResponseStatusException exception){
+        this.errors = Arrays.asList(exception.getReason());
     }
 
     public List<String> getErrors() {
