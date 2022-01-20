@@ -51,7 +51,7 @@ public class BookRepositoryTest {
         Book book = registerABook(isbn);
         testEntityManager.persist(book);
 
-        boolean exists = bookRepository.existsByIsbn(isbn);
+        boolean exists = bookRepository.existsByIsbn("27052001");
 
         assertThat(exists).isFalse();
 

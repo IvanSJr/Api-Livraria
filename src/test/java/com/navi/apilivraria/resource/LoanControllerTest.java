@@ -25,8 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -34,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class LoanControllerTest {
 
-    static final String loanApi = "/api/loans";
+    static final String LOAN_API = "/api/loans";
 
     @Autowired
     MockMvc mvc;
@@ -47,7 +46,7 @@ public class LoanControllerTest {
     @Test
     @DisplayName("Deve realizar um emprestimo")
     public void makeLoan() throws Exception {
-        LoanDTO loanDTO = LoanDTO.builder().isbn("27062001").customer("Ivan Júnior").build();
+        LoanDTO loanDTO = LoanDTO.builder().isbn("27062001").customer("Ivan").build();
         String json = new ObjectMapper().writeValueAsString(loanDTO);
 
         Book book = Book.builder().id(1L).isbn("27062001").build();
@@ -55,17 +54,17 @@ public class LoanControllerTest {
                 .willReturn(Optional.of(book));
 
         Loan loan = Loan.builder()
-                .id(1L).customer("Ivan Júnior").book(book).localDate(LocalDate.now()).build();
+                .id(1L).customer("Ivan").book(book).localDate(LocalDate.now()).build();
         BDDMockito.given(loanService.save(Mockito.any(Loan.class))).willReturn(loan);
 
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(loanApi)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(LOAN_API)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
         mvc.perform(requestBuilder)
                 .andExpect( status().isCreated() )
-                .andExpect(jsonPath("id").value(1L));
+                .andExpect( content().string("1"));
     }
 
 }
